@@ -3,9 +3,9 @@ import {
   ClockIcon,
   UserGroupIcon,
   InboxIcon,
-} from '@heroicons/react/24/outline';
-import { lusitana } from '@/app/ui/fonts';
-import { invoices, customers } from "../../lib/placeholder-data";
+} from "@heroicons/react/24/outline";
+import { lusitana } from "@/app/ui/fonts";
+import { fetchCardData } from "@/app/lib/data";
 
 const iconMap = {
   collected: BanknotesIcon,
@@ -14,47 +14,13 @@ const iconMap = {
   invoices: InboxIcon,
 };
 
-function getTotalCustomer(): number {
-  return customers.length;
-}
-
-function delayedGetTotalCustomer(delay: number): Promise<number> {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(getTotalCustomer());
-    }, delay);
-  });
-}
-
-function getTotalInvoice(): number {
-  return invoices.length;
-}
-
-function getTotalPaidInvoices(): string {
-  let total = 0;
-  invoices
-    .filter((inv) => inv.status === "paid")
-    .forEach((inv) => {
-      total += inv.amount;
-    });
-  return `$${total}`;
-}
-
-function getTotalPendingInvoices(): string {
-  let total = 0;
-  invoices
-    .filter((inv) => inv.status === "pending")
-    .forEach((inv) => {
-      total += inv.amount;
-    });
-  return `$${total}`;
-}
-
 export default async function CardWrapper() {
-  const totalPaidInvoices = getTotalPaidInvoices();
-  const totalPendingInvoices = getTotalPendingInvoices();
-  const numberOfInvoices = getTotalInvoice();
-  const numberOfCustomers = await delayedGetTotalCustomer(2500);
+  const {
+    totalPaidInvoices,
+    totalPendingInvoices,
+    numberOfInvoices,
+    numberOfCustomers,
+  } = await fetchCardData();
   return (
     <>
       {/* NOTE: Uncomment this code in Chapter 9 */}
@@ -78,7 +44,7 @@ export function Card({
 }: {
   title: string;
   value: number | string;
-  type: 'invoices' | 'customers' | 'pending' | 'collected';
+  type: "invoices" | "customers" | "pending" | "collected";
 }) {
   const Icon = iconMap[type];
 
